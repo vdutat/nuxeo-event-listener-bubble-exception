@@ -1,0 +1,12 @@
+<component name="org.nuxeo.eventlistener.listener.contrib.AbortMoveToFolderEventListener">
+
+  <extension target="org.nuxeo.ecm.core.event.EventServiceComponent"
+    point="listener">
+
+    <listener name="abortmovetofoldereventlistener" async="false" postCommit="false"
+      class="org.nuxeo.eventlistener.AbortMoveToFolderEventListener" priority="100">
+      <event>aboutToMove</event>
+    </listener>
+  </extension>
+
+</component>
