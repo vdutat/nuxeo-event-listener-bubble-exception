@@ -1,12 +1,13 @@
 Manifest-Version: 1.0
-Bundle-SymbolicName: nuxeo-event-listener-bubble-exception
-Bundle-Name: nuxeo-event-listener-bubble-exception
-Bundle-Version: 1.0
-Bundle-ClassPath: .
-Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-ManifestVersion: 2
 Bundle-Vendor: Nuxeo
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Bundle-Version: 1.0
+Bundle-Name: nuxeo-event-listener-bubble-exception
 Nuxeo-Component: OSGI-INF/extensions/org.nuxeo.eventlistener.AbortMove
- ToFolderEventListener.xml
+ ToFolderEventListener.xml,OSGI-INF/extensions/org.nuxeo.eventlistener
+ .AbortCreateDocumentSameTitleEventListener.xml
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: nuxeo-event-listener-bubble-exception
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 

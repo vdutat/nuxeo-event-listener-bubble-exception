@@ -1,0 +1,12 @@
+<component name="org.nuxeo.eventlistener.listener.contrib.AbortCreateDocumentSameTitleEventListener">
+
+  <extension target="org.nuxeo.ecm.core.event.EventServiceComponent"
+    point="listener">
+
+    <listener name="abortcreatedocumentsametitleeventlistener" async="false" postCommit="false"
+      class="org.nuxeo.eventlistener.AbortCreateDocumentSameTitleEventListener" priority="0">
+      <event>aboutToCreate</event>
+    </listener>
+  </extension>
+
+</component>
