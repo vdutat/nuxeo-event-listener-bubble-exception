@@ -21,10 +21,12 @@ package org.nuxeo.eventlistener;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.nuxeo.ecm.automation.OperationContext;
+import org.nuxeo.ecm.automation.core.scripting.Expression;
+import org.nuxeo.ecm.automation.core.scripting.Scripting;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IterableQueryResult;
@@ -40,6 +42,8 @@ import org.nuxeo.ecm.core.query.sql.NXQL;
 import org.nuxeo.ecm.core.query.sql.model.Operator;
 import org.nuxeo.ecm.platform.web.common.exceptionhandling.ExceptionHelper;
 import org.nuxeo.eventlistener.exception.CustomClientException;
+import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.runtime.services.config.ConfigurationService;
 
 /**
  * Prevents the creation of a document of type 'File' when a document with the same title
@@ -49,9 +53,13 @@ import org.nuxeo.eventlistener.exception.CustomClientException;
  */
 public class AbortCreateDocumentSameTitleEventListener implements EventListener {
 
+    private static final String ERROR_MESSAGE_PREFIX = "Document creation aborted: ";
+
     private static final Log LOG = LogFactory.getLog(AbortCreateDocumentSameTitleEventListener.class);
 
     static final List<String> docTypesToCheck = Arrays.asList("File");
+
+    private String message = ERROR_MESSAGE_PREFIX + "unknown reason";
 
     @Override
     public void handleEvent(Event event) {
@@ -73,7 +81,6 @@ public class AbortCreateDocumentSameTitleEventListener implements EventListener 
         }
         if (!documentComplies(ctx)) {
             LOG.warn(doc.getPathAsString() + " does not comply");
-            String message = "document with same title already exists in " + (String) ctx.getProperty(CoreEventConstants.DESTINATION_PATH);
             event.markBubbleException();
             event.markRollBack();
             if (restApiOnly) {
@@ -90,33 +97,51 @@ public class AbortCreateDocumentSameTitleEventListener implements EventListener 
      */
     protected boolean documentComplies(DocumentEventContext ctx) {
         DocumentModel doc = ctx.getSourceDocument();
-        String title = (String) doc.getPropertyValue("dc:title");
-        // checking if document has a title
-        if (StringUtils.isEmpty(title)) {
-            // Ignore document
-            return true;
+        ConfigurationService service = Framework.getService(ConfigurationService.class);
+        String expressionStr = service.getProperty("nuxeo.listener.abortDocumentCreation.expression");
+        if (expressionStr != null) {
+            LOG.debug("expression: " + expressionStr);
+            Expression expression = Scripting.newExpression(expressionStr);
+            message = ERROR_MESSAGE_PREFIX + "expression [" + expressionStr + "] returned 'false'";
+            if (expression != null) {
+                OperationContext opCtx = new OperationContext(ctx.getCoreSession());
+                opCtx.setInput(doc);
+                opCtx.getVars().put("eventContext", ctx);
+                return (boolean) expression.eval(opCtx);
+            } else {
+                return false;
+            }
+
+        } else {
+            String title = (String) doc.getPropertyValue("dc:title");
+            // checking if document has a title
+            if (StringUtils.isEmpty(title)) {
+                // Ignore document
+                return true;
+            }
+            // checking if document is created under a specific folderish document
+            if (!StringUtils.startsWith((String) ctx.getProperty(CoreEventConstants.DESTINATION_PATH), "/default-domain/workspaces/ws1")) {
+                // Ignore document
+                return true;
+            }
+            // rejecting documents with same title only of type 'File'
+            if (!docTypesToCheck.contains(doc.getType())) {
+                // Ignore document
+                return true;
+            }
+            message = ERROR_MESSAGE_PREFIX + "document with same title already exists in " + (String) ctx.getProperty(CoreEventConstants.DESTINATION_PATH);
+            // retrieving parent folderish document
+            DocumentRef parentRef = (DocumentRef) ctx.getProperty(CoreEventConstants.DESTINATION_REF);
+            DocumentModel parentDoc = ctx.getCoreSession().getDocument(parentRef);
+            // searching for documents with same title in the parent folderish document
+            StringBuilder sb = new StringBuilder("SELECT " + NXQL.ECM_UUID + " FROM Document WHERE ");
+            sb.append("dc:title").append(Operator.EQ.toString()).append(NXQL.escapeString(title))
+            .append(" " + Operator.AND.toString() + " ").append(NXQL.ECM_PARENTID).append(Operator.EQ.toString()).append(NXQL.escapeString(parentDoc.getId()))
+            .append(" " + Operator.AND.toString() + " ").append(NXQL.ECM_ISCHECKEDIN).append(Operator.EQ.toString() + "0");
+            LOG.debug("NXQL query: " + sb.toString());
+            IterableQueryResult result = ctx.getCoreSession().queryAndFetch(sb.toString(), NXQL.NXQL);
+            LOG.debug("result nbr: " + result.size());
+            return (result.size() == 0);
         }
-        // checking if document is created under a specific folderish document
-        if (!StringUtils.startsWith((String) ctx.getProperty(CoreEventConstants.DESTINATION_PATH), "/default-domain/workspaces/ws1")) {
-            // Ignore document
-            return true;
-        }
-        // rejecting documents with same title only of type 'File'
-        if (!docTypesToCheck.contains(doc.getType())) {
-            // Ignore document
-            return true;
-        }
-        // retrieving parent folderish document
-        DocumentRef parentRef = (DocumentRef) ctx.getProperty(CoreEventConstants.DESTINATION_REF);
-        DocumentModel parentDoc = ctx.getCoreSession().getDocument(parentRef);
-        // searching for documents with same title in the parent folderish document
-        StringBuilder sb = new StringBuilder("SELECT " + NXQL.ECM_UUID + " FROM Document WHERE ");
-        sb.append("dc:title").append(Operator.EQ.toString()).append(NXQL.escapeString(title))
-        .append(" " + Operator.AND.toString() + " ").append(NXQL.ECM_PARENTID).append(Operator.EQ.toString()).append(NXQL.escapeString(parentDoc.getId()))
-        .append(" " + Operator.AND.toString() + " ").append(NXQL.ECM_ISCHECKEDIN).append(Operator.EQ.toString() + "0");
-        LOG.debug("NXQL query: " + sb.toString());
-        IterableQueryResult result = ctx.getCoreSession().queryAndFetch(sb.toString(), NXQL.NXQL);
-        LOG.debug("result nbr: " + result.size());
-        return (result.size() == 0);
     }
 }
