@@ -84,6 +84,10 @@ public class AbortCreateDocumentSameTitleEventListener implements EventListener 
         }
     }
 
+    /**
+     * @param ctx
+     * @return <code>true</code> if document can be created, <code>false</code> to cancel document's creation
+     */
     protected boolean documentComplies(DocumentEventContext ctx) {
         DocumentModel doc = ctx.getSourceDocument();
         String title = (String) doc.getPropertyValue("dc:title");
