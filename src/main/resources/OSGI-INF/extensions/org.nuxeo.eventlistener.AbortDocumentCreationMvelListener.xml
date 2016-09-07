@@ -1,0 +1,12 @@
+<component name="org.nuxeo.eventlistener.listener.contrib.AbortDocumentCreationMvelListener">
+
+  <extension target="org.nuxeo.ecm.core.event.EventServiceComponent"
+    point="listener">
+
+    <listener name="abort-document-creation-mvel-listener" async="false" postCommit="false"
+      class="org.nuxeo.eventlistener.AbortDocumentCreationMvelListener" priority="10">
+      <event>aboutToCreate</event>
+    </listener>
+  </extension>
+
+</component>
