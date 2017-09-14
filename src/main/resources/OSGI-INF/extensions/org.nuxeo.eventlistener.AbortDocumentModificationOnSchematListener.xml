@@ -1,0 +1,12 @@
+<component name="org.nuxeo.eventlistener.listener.contrib.AbortDocumentModificationOnSchemaListener">
+
+  <extension target="org.nuxeo.ecm.core.event.EventServiceComponent"
+    point="listener">
+
+    <listener name="abortDocumentModificationOnSchemaListener" async="false" postCommit="false"
+      class="org.nuxeo.eventlistener.AbortDocumentModificationOnSchemaListener" priority="100">
+      <event>beforeDocumentModification</event>
+    </listener>
+  </extension>
+
+</component>

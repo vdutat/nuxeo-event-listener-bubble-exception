@@ -54,20 +54,20 @@ public class AbortCreateDocumentSameTitleEventListener extends AbortDocumentCrea
         String title = (String) doc.getPropertyValue("dc:title");
         // checking if document has a title
         if (StringUtils.isEmpty(title)) {
-        	// Ignore document
-        	return true;
+            // Ignore document
+            return true;
         }
         // checking if document is created under a specific folderish document
         if (!StringUtils.startsWith((String) ctx.getProperty(CoreEventConstants.DESTINATION_PATH), "/default-domain/workspaces/ws1")) {
-        	// Ignore document
-        	return true;
+            // Ignore document
+            return true;
         }
         // rejecting documents with same title only of type 'File'
         if (!docTypesToCheck.contains(doc.getType())) {
-        	// Ignore document
-        	return true;
+            // Ignore document
+            return true;
         }
-        setMessage("document with same title already exists in " + (String) ctx.getProperty(CoreEventConstants.DESTINATION_PATH));
+        setMessage(ERROR_MESSAGE_PREFIX + "document with same title already exists in " + (String) ctx.getProperty(CoreEventConstants.DESTINATION_PATH));
         // retrieving parent folderish document
         DocumentRef parentRef = (DocumentRef) ctx.getProperty(CoreEventConstants.DESTINATION_REF);
         DocumentModel parentDoc = ctx.getCoreSession().getDocument(parentRef);

@@ -18,15 +18,15 @@ public class AbortMoveToFolderEventListener extends AbortDocumentCreationListene
 
     protected static final String PROPERTY_NAME = "nuxeo.bundle.nuxeo-event-listener.bubble-exception.config.folder";
 
-	private static final Log LOG = LogFactory.getLog(AbortMoveToFolderEventListener.class);
+    private static final Log LOG = LogFactory.getLog(AbortMoveToFolderEventListener.class);
 
     @Override
-	protected boolean acceptedEvent(Event event) {
-		return true;
-	}
+    protected boolean acceptedEvent(Event event) {
+        return true;
+    }
 
     @Override
-	protected boolean documentComplies(DocumentEventContext ctx) {
+    protected boolean documentComplies(DocumentEventContext ctx) {
         String destinationPath = (String) ctx.getProperty(CoreEventConstants.DESTINATION_PATH);
         if (StringUtils.isEmpty(destinationPath)) {
             return true;
@@ -35,10 +35,10 @@ public class AbortMoveToFolderEventListener extends AbortDocumentCreationListene
         String configFolder = service.getProperty(PROPERTY_NAME);
         if (!StringUtils.isEmpty(configFolder) && destinationPath.equals(configFolder)) {
             DocumentModel doc = ctx.getSourceDocument();
-            setMessage("move document aborted: " + doc.getPathAsString() + " to " + destinationPath);
+            setMessage(ERROR_MESSAGE_PREFIX + "move document aborted: " + doc.getPathAsString() + " to " + destinationPath);
             return false;
         }
         return true;
-	}
+    }
 
 }

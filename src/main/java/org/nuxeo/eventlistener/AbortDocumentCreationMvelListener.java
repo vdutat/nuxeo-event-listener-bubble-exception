@@ -24,7 +24,7 @@ public class AbortDocumentCreationMvelListener extends AbortDocumentCreationList
         if (expressionStr != null) {
             LOG.debug("expression: " + expressionStr);
             Expression expression = Scripting.newExpression(expressionStr);
-            setMessage("expression [" + expressionStr + "] returned 'false'");
+            setMessage(ERROR_MESSAGE_PREFIX + "expression [" + expressionStr + "] returned 'false'");
             if (expression != null) {
                 OperationContext opCtx = new OperationContext(ctx.getCoreSession());
                 opCtx.setInput(doc);
