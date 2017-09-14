@@ -40,7 +40,7 @@ public class AbortDocumentModificationOnSchemaListener extends AbortDocumentCrea
             return true;
         }
         LOGGER.debug("<documentComplies> " + doc.getPathAsString());
-        setMessage("fields of schema '" + SCHEMA_NAME + "' are being updated");
+        setMessage(ERROR_MESSAGE_PREFIX + "fields of schema '" + SCHEMA_NAME + "' are being updated");
         // returns 'false'  in order to cancel the modification of the document
         return !doc.getDataModel(SCHEMA_NAME).isDirty();
     }

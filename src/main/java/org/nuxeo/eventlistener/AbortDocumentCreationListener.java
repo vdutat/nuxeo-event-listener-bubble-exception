@@ -54,7 +54,7 @@ public abstract class AbortDocumentCreationListener implements EventListener {
 	protected abstract boolean documentComplies(DocumentEventContext ctx);
 
 	protected String getMessage() {
-		return ERROR_MESSAGE_PREFIX + message;
+		return message;
 	}
 
 	protected void setMessage(String message) {

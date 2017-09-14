@@ -67,7 +67,7 @@ public class AbortCreateDocumentSameTitleEventListener extends AbortDocumentCrea
         	// Ignore document
         	return true;
         }
-        setMessage("document with same title already exists in " + (String) ctx.getProperty(CoreEventConstants.DESTINATION_PATH));
+        setMessage(ERROR_MESSAGE_PREFIX + "document with same title already exists in " + (String) ctx.getProperty(CoreEventConstants.DESTINATION_PATH));
         // retrieving parent folderish document
         DocumentRef parentRef = (DocumentRef) ctx.getProperty(CoreEventConstants.DESTINATION_REF);
         DocumentModel parentDoc = ctx.getCoreSession().getDocument(parentRef);
