@@ -6,7 +6,7 @@ Bundle-Version: 1.0
 Bundle-Name: nuxeo-event-listener-bubble-exception
 Nuxeo-Component: OSGI-INF/extensions/org.nuxeo.eventlistener.AbortMove
  ToFolderEventListener.xml,OSGI-INF/extensions/org.nuxeo.eventlistener
- .AbortCreateDocumentSameTitleEventListener.xml,OSGI-INF/extensions/org.nuxeo.eventlistener.AbortDocumentCreationMvelListener.xml
+ .AbortCreateDocumentSameTitleEventListener.xml,OSGI-INF/extensions/org.nuxeo.eventlistener.AbortDocumentCreationMvelListener.xml,OSGI-INF/extensions/org.nuxeo.eventlistener.AbortDocumentModificationOnSchematListener.xml
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: nuxeo-event-listener-bubble-exception
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
